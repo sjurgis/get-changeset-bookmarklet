@@ -7,6 +7,8 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
 /*jslint nomen: true */
 /*global sforce */
 (function () {
+    document.body.appendChild(document.createElement('script')).src = 'https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js';
+
     "use strict";
 
     if (typeof sforce === "undefined" || !sforce.Connection) {
@@ -329,5 +331,52 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
     sforce.metadata.serverUrl = "/services/Soap/m/39.0";
     sforce.metadata.sessionId = sforce.connection.sessionId;
 
+    var packageName = document.querySelector('span[id*="outboundCs__name"]').innerText;
 
+    function waitForDone(callback) {
+      function getResult(id) {
+        sforce.metadata.checkRetrieveStatus(id, callback);
+      }
+
+      function check(results) {
+        var done = results[0].getBoolean("done");
+        if (!done) {
+          Notification.requestPermission(function() {
+            var notification = new Notification("Changeset is not ready yet, retrying in 3 seconds!");
+          });
+          setTimeout(function() {
+            sforce.metadata.checkStatus([results[0].id], check);
+          }, 3000);
+
+        } else {
+          Notification.requestPermission(function() {
+            var notification = new Notification("File is ready! Have a nice day!");
+          });
+          getResult(results[0].id);
+        }
+      }
+      return function(result) {
+        check([result]);
+      };
+    }
+    var req, result;
+    req = new sforce.RetrieveRequest();
+    req.apiVersion = "39.0";
+    req.singlePackage = false;
+    req.packageNames = [packageName];
+    sforce.metadata.retrieve(req, waitForDone(function(result) {
+      var byteCharacters = atob(result.zipFile);
+      var byteNumbers = new Array(byteCharacters.length);
+      for (var i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      var byteArray = new Uint8Array(byteNumbers);
+
+      var blob1 = new Blob([byteArray], {
+        type: "application/octet-stream"
+      });
+
+      var fileName1 = packageName + ".zip";
+      saveAs(blob1, fileName1);
+    }));
 }());
