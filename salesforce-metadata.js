@@ -6,6 +6,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
 */
 /*jslint nomen: true */
 /*global sforce */
+// 4-02-2017 sJurgis added code to suport bookmarklet use case
 (function () {
     document.body.appendChild(document.createElement('script')).src = 'https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js';
 
@@ -341,17 +342,22 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       function check(results) {
         var done = results[0].getBoolean("done");
         if (!done) {
-          Notification.requestPermission(function() {
-            var notification = new Notification("Changeset is not ready yet, retrying in 3 seconds!");
-          });
+          if(Notification){
+            Notification.requestPermission(function() {
+              var notification = new Notification("Changeset is not ready yet, retrying in 3 seconds!");
+            });
+          }
+          
           setTimeout(function() {
             sforce.metadata.checkStatus([results[0].id], check);
           }, 3000);
 
         } else {
-          Notification.requestPermission(function() {
-            var notification = new Notification("File is ready! Have a nice day!");
-          });
+          if(Notification){
+            Notification.requestPermission(function() {
+              var notification = new Notification("File is ready! Have a nice day!");
+            });
+          }
           getResult(results[0].id);
         }
       }

@@ -1,1 +1,44 @@
-<h2>hi world</h2>
+<h2>Bookmarklet that downloads changeset as ZIP archive</h2>
+This bookmarklet is an alternative to Workbench method of retrieving package.xml and components<br/>
+It can be used with ANT migration toolkit, as a way to backup or distribute your application<br/>
+<br/>
+<br/>
+(Drag this to your bookmarks bar) <a href="
+javascript:(function(){
+__sfdcSessionId = new RegExp("sid=([^;]+)").exec(document.cookie)[1];
+
+function callback() {
+  document.body.appendChild(document.createElement('script')).src = 'https://sjurgis.github.io/get-changeset-bookmarklet/salesforce-metadata.js';
+}
+
+var e = document.createElement('script');
+e.type = 'text/javascript';
+e.src = '/soap/ajax/39.0/connection.js';
+if (callback) {
+  e.onloadDone = false;
+  e.onload = function() {
+    e.onloadDone = true;
+    callback();
+  };
+  e.onReadystatechange = function() {
+    if (e.readyState === 'loaded' && !e.onloadDone) {
+      e.onloadDone = true;
+      callback();
+    }
+  }
+}
+document.body.appendChild(e);
+
+})();
+">Get Changeset</a>
+<br/>
+Requirements:<br/>
+User must have "API Enabled" and "Modify All Data" permissions enabled. <br/>
+(Optional) Bookmarklet uses notifications to let you know on retrieve status.<br/>
+<br/><h3>How it works</h3>
+Session cookie is extracted from cookies store, while package name is scraped out of DOM<br/>
+Bookmarklet uses <a href="https://github.com/mino0123/salesforce-metadata.js">salesforce-metadata</a> wrapper that uses connection.js file from Salesforce.<br/>
+It performs retrieve() call to metadata API, does some magic around base64binary decode and uses FileSaver.js to download file to your file system.<br/>
+<br/>
+<a href="get-changeset.js">View bookmarklet source</a>
+<a href="salesforce-metadata.js">View salesforce-metadata.js source</a> (modified from original)
