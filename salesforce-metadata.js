@@ -9,9 +9,6 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
 // 4-02-2017 sJurgis added code to suport bookmarklet use case
 (function () {
     document.body.appendChild(document.createElement('script')).src = 'https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js';
-    document.body.appendChild(document.createElement('script')).src = 'https://api.filepicker.io/v2/filepicker.js';
-    
-
     "use strict";
 
     if (typeof sforce === "undefined" || !sforce.Connection) {
@@ -379,14 +376,19 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       //   });
       // }
       // return;
-      
-      
-      filepicker.pick(
-        function(Blob){
-          console.log(Blob.url);
-          req.Package = Blob;
-        }
-      );
+      var input = document.createElement('input');
+      input.type='file';
+      input.accepty='.xml';
+      document.body.appendChild(input);
+      input.click();
+
+
+      // filepicker.pick(
+      //   function(Blob){
+      //     console.log(Blob.url);
+      //     req.Package = Blob;
+      //   }
+      // );
     } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
       req.packageNames = [document.querySelector('span[id*="outboundCs__name"]')];
     } else {
