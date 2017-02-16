@@ -337,7 +337,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       if(Notification){
         Notification.requestPermission(function() {
           var notification = new Notification(
-            "Woops! Inbount packages are not supported yet!");
+            "Woops! Inbound packages are not supported yet!");
         });
       }
       return;
