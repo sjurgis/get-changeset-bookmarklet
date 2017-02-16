@@ -346,7 +346,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
             "Woops! Cannot find package name. \n Are you sure you got inbound or outbound changeset open?");
         });
       }
-      break;
+      return;
     }
     
 
