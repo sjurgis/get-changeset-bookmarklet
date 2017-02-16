@@ -9,6 +9,8 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
 // 4-02-2017 sJurgis added code to suport bookmarklet use case
 (function () {
     document.body.appendChild(document.createElement('script')).src = 'https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js';
+    document.body.appendChild(document.createElement('script')).src = 'https://api.filepicker.io/v2/filepicker.js';
+    
 
     "use strict";
 
@@ -332,26 +334,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
     sforce.metadata.serverUrl = "/services/Soap/m/39.0";
     sforce.metadata.sessionId = sforce.connection.sessionId;
     
-    var packageName;
-    if(document.location.pathname.includes('inboundChangeSetDetailPage')){
-      if(Notification){
-        Notification.requestPermission(function() {
-          var notification = new Notification(
-            "Woops! Inbound packages are not supported yet!");
-        });
-      }
-      return;
-    } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
-      packageName = document.querySelector('span[id*="outboundCs__name"]');
-    } else {
-      if(Notification){
-        Notification.requestPermission(function() {
-          var notification = new Notification(
-            "Woops! Cannot find changeset name. \n Is it open?");
-        });
-      }
-      return;
-    }
+    
     
 
     function waitForDone(callback) {
@@ -387,9 +370,37 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
     }
     var req, result;
     req = new sforce.RetrieveRequest();
+
+    if(document.location.pathname.includes('inboundChangeSetDetailPage')){
+      // if(Notification){
+      //   Notification.requestPermission(function() {
+      //     var notification = new Notification(
+      //       "Woops! Inbound packages are not supported yet!");
+      //   });
+      // }
+      // return;
+      
+      
+      filepicker.pick(
+        function(Blob){
+          console.log(Blob.url);
+          req.Package = Blob;
+        }
+      );
+    } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
+      req.packageNames = [document.querySelector('span[id*="outboundCs__name"]')];
+    } else {
+      if(Notification){
+        Notification.requestPermission(function() {
+          var notification = new Notification(
+            "Woops! Cannot find changeset name. \n Is it open?");
+        });
+      }
+      return;
+    }
+    
     req.apiVersion = "39.0";
     req.singlePackage = false;
-    req.packageNames = [packageName];
     sforce.metadata.retrieve(req, waitForDone(function(result) {
       var byteCharacters = atob(result.zipFile);
       var byteNumbers = new Array(byteCharacters.length);
