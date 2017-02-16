@@ -376,37 +376,55 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       //   });
       // }
       // return;
+      // var input = document.createElement('input');
+      // input.addEventListener("change", function(evt) {
+      //     var reader = new FileReader();
+      //     // reader.readAsText(input.files[0]);
+      //     console.log(reader.result);
+      //     
+      // }, false);
+      // input.type='file';
+      // input.accept='.xml';
+      // document.body.appendChild(input);
+      // input.click();
+      // return;
+
       var input = document.createElement('input');
       input.addEventListener("change", function(evt) {
           var reader = new FileReader();
-          // reader.readAsText(input.files[0]);
-          console.log(reader.result);
-          var req, result;
-          req = new sforce.RetrieveRequest();
-          req.Package = reader.result;
-          req.apiVersion = "39.0";
-          req.singlePackage = false;
-          sforce.metadata.retrieve(req, waitForDone(function(result) {
-            var byteCharacters = atob(result.zipFile);
-            var byteNumbers = new Array(byteCharacters.length);
-            for (var i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            var byteArray = new Uint8Array(byteNumbers);
+          reader.onloadend = function(m){
+            var req, result;
+            req = new sforce.RetrieveRequest();
+            req.Package = m.currentTarget.result;
+            req.apiVersion = "39.0";
+            req.singlePackage = false;
+            sforce.metadata.retrieve(req, waitForDone(function(result) {
+              var byteCharacters = atob(result.zipFile);
+              var byteNumbers = new Array(byteCharacters.length);
+              for (var i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+              }
+              var byteArray = new Uint8Array(byteNumbers);
 
-            var blob1 = new Blob([byteArray], {
-              type: "application/octet-stream"
-            });
+              var blob1 = new Blob([byteArray], {
+                type: "application/octet-stream"
+              });
 
-            var fileName1 = packageName + ".zip";
-            saveAs(blob1, fileName1);
-          }));
+              var fileName1 = packageName + ".zip";
+              saveAs(blob1, fileName1);
+            }));
+          };
+          reader.readAsText(input.files[0]);
+          // req.Package = this.value;
       }, false);
       input.type='file';
       input.accept='.xml';
       document.body.appendChild(input);
       input.click();
       return;
+
+
+
 
     } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
       req.packageNames = [document.querySelector('span[id*="outboundCs__name"]').innerText];
