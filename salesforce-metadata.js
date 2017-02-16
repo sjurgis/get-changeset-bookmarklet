@@ -332,18 +332,22 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
     sforce.metadata.serverUrl = "/services/Soap/m/39.0";
     sforce.metadata.sessionId = sforce.connection.sessionId;
     
-    var inBound = document.querySelector('span[id*="ics_name"]');
-    var outBound = document.querySelector('span[id*="outboundCs__name"]');
     var packageName;
-    if(inBound){
-      packageName = inBound.innerText;
-    } else if(outBound){
-      packageName = outBound.innerText;
+    if(document.location.pathname.includes('inboundChangeSetDetailPage')){
+      if(Notification){
+        Notification.requestPermission(function() {
+          var notification = new Notification(
+            "Woops! Inbount packages are not supported yet!");
+        });
+      }
+      return;
+    } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
+      packageName = document.querySelector('span[id*="outboundCs__name"]');
     } else {
       if(Notification){
         Notification.requestPermission(function() {
           var notification = new Notification(
-            "Woops! Cannot find package name. \n Are you sure you got inbound or outbound changeset open?");
+            "Woops! Cannot find changeset name. \n Is it open?");
         });
       }
       return;
