@@ -379,7 +379,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       var input = document.createElement('input');
       input.addEventListener("change", function(evt) {
           var reader = new FileReader();
-          reader.readAsText(input.files[0]);
+          // reader.readAsText(input.files[0]);
           console.log(reader.result);
           var req, result;
           req = new sforce.RetrieveRequest();
