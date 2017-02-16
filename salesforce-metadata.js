@@ -393,6 +393,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       input.addEventListener("change", function(evt) {
           var reader = new FileReader();
           reader.onloadend = function(m){
+            console.log(m.currentTarget.result);
             var req, result;
             req = new sforce.RetrieveRequest();
             req.Package = m.currentTarget.result;
@@ -410,7 +411,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
                 type: "application/octet-stream"
               });
 
-              var fileName1 = packageName + ".zip";
+              var fileName1 = 'packageName' + ".zip";
               saveAs(blob1, fileName1);
             }));
           };
