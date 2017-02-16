@@ -408,14 +408,8 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       input.click();
       return;
 
-      // filepicker.pick(
-      //   function(Blob){
-      //     console.log(Blob.url);
-      //     req.Package = Blob;
-      //   }
-      // );
     } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
-      req.packageNames = [document.querySelector('span[id*="outboundCs__name"]')];
+      req.packageNames = [document.querySelector('span[id*="outboundCs__name"]').innerText];
     } else {
       if(Notification){
         Notification.requestPermission(function() {
