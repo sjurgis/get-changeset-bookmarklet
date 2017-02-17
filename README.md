@@ -2,6 +2,7 @@
 This bookmarklet is an alternative to Workbench method of retrieving package.xml and components.
 It can be used with ANT migration toolkit, as a way to backup or distribute your application.
 
+Go to [my Github page](https://sjurgis.github.io/get-changeset-bookmarklet/) to install it.
 
 # Requirements
 User must have 'API Enabled' and 'Modify All Data' permissions enabled.
@@ -11,3 +12,4 @@ User must have 'API Enabled' and 'Modify All Data' permissions enabled.
 Session cookie is extracted from cookies store, while package name is scraped out of DOM
 Bookmarklet uses salesforce-metadata wrapper that uses connection.js file from Salesforce.
 It performs retrieve() call to metadata API, does some magic around base64binary decode and uses FileSaver.js to download file to your file system.
+
