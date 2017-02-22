@@ -4,7 +4,7 @@ It can be used with ANT migration toolkit, as a way to backup or distribute your
 
 # Usage
 If you are have outbound changeset open, it will download the corresponding .zip file. 
-If you have ANY inbound changeset open, it will request package.xml file (you can find in .zip file from previous step) and download .zip file represending current files (great for backing up code).
+If you have ANY inbound changeset open, it will request package.xml file (you can find it in .zip file from previous step) and download a new .zip file with current metadata (great for backing up code).
 
 Go to [my Github page](https://sjurgis.github.io/get-changeset-bookmarklet/) to install it.
 
