@@ -377,7 +377,8 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
               
               var doc = new DOMParser().parseFromString(m.currentTarget.result, "text/xml");
               var names = doc.getElementsByTagName("name");
-
+              var fullName = doc.getElementsByTagName("fullName");
+              
               var unpackaged = {
                 types: []
               };
@@ -410,7 +411,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
                   type: "application/octet-stream"
                 });
 
-                var fileName1 = 'packageName' + ".zip";
+                var fileName1 = ((fullName[0])? fullName[0].innerHTML : 'package' + new Date()) + "-i.zip";
                 saveAs(blob1, fileName1);
               }));
             };
@@ -443,7 +444,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
             type: "application/octet-stream"
           });
 
-          var fileName1 = req.packageNames[0] + ".zip";
+          var fileName1 = req.packageNames[0] + "-o.zip";
           saveAs(blob1, fileName1);
         }));
       } else {
