@@ -340,7 +340,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
         alert(str);
       }
     }
-    
+    var retryInterval = 3000;
     
 
     function waitForDone(callback) {
@@ -351,12 +351,12 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       function check(results) {
         var done = results[0].getBoolean("done");
         if (!done) {
-          
-          note("Changeset is not ready yet, retrying in 3 seconds!");
+          retryInterval += 1000;
+          note("Changeset is not ready yet, retrying in "+ retryInterval/1000 +" seconds!");
           
           setTimeout(function() {
             sforce.metadata.checkStatus([results[0].id], check);
-          }, 3000);
+          }, retryInterval);
 
         } else {
           note("File is ready! Have a nice day!");
