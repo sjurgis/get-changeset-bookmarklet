@@ -366,34 +366,12 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       };
     }
   
-
     if(document.location.pathname.includes('inboundChangeSetDetailPage')){
-      // if(Notification){
-      //   Notification.requestPermission(function() {
-      //     var notification = new Notification(
-      //       "Woops! Inbound packages are not supported yet!");
-      //   });
-      // }
-      // return;
-      // var input = document.createElement('input');
-      // input.addEventListener("change", function(evt) {
-      //     var reader = new FileReader();
-      //     // reader.readAsText(input.files[0]);
-      //     console.log(reader.result);
-      //     
-      // }, false);
-      // input.type='file';
-      // input.accept='.xml';
-      // document.body.appendChild(input);
-      // input.click();
-      // return;
-
       var input = document.createElement('input');
       input.addEventListener("change", function(evt) {
+          document.getElementById('filepicker').style="display:none";
           var reader = new FileReader();
           reader.onloadend = function(m){
-            console.log(m.currentTarget.result);
-            
             
             var doc = new DOMParser().parseFromString(m.currentTarget.result, "text/xml");
             var names = doc.getElementsByTagName("name");
@@ -412,7 +390,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
                 unpackaged.types.push(types);
               });
             
-            console.log(unpackaged);
+
             var req, result;
             req = new sforce.RetrieveRequest();
             req.unpackaged = unpackaged;
@@ -435,17 +413,16 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
             }));
           };
           reader.readAsText(input.files[0]);
-          // req.Package = this.value;
       }, false);
-
       input.type='file';
       input.accept='.xml';
-      document.body.appendChild(input);
-      input.click();
-
-
-
-
+      
+      var div = document.createElement('div');
+      div.id = 'filepicker';
+      div.style="opacity:0.9; background: #FFF; width:100%;height:100%; z-index:10;top:0;left:0; position:fixed;"
+      div.appendChild(input);
+      document.body.appendChild(div);
+      // input.click();
 
     } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
       var req, result;
@@ -477,6 +454,5 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       }
       return;
     }
-    
     
 }());
