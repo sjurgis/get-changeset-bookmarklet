@@ -411,7 +411,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
                   type: "application/octet-stream"
                 });
 
-                var fileName1 = ((fullName[0])? fullName[0].innerHTML : 'package' + new Date()) + "-i.zip";
+                var fileName1 = ((fullName[0])? fullName[0].innerHTML : 'package ' + new Date()) + "-i.zip";
                 saveAs(blob1, fileName1);
               }));
             };
