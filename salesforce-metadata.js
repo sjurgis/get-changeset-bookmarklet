@@ -394,9 +394,29 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
           var reader = new FileReader();
           reader.onloadend = function(m){
             console.log(m.currentTarget.result);
+            
+            
+            var doc = new DOMParser().parseFromString(m.currentTarget.result, "text/xml");
+            var names = doc.getElementsByTagName("name");
+
+            var unpackaged = {
+              types: []
+            };
+            [].slice.call(doc.getElementsByTagName("types"))
+              .forEach((t, i) => {
+                var types = {
+                  name: names[i].innerHTML,
+                  members: [].slice.call(t.getElementsByTagName("members")).map(m => {
+                    return m.innerHTML;
+                  })
+                };
+                unpackaged.types.push(types);
+              });
+            
+            console.log(unpackaged);
             var req, result;
             req = new sforce.RetrieveRequest();
-            req.Package = m.currentTarget.result;
+            req.unpackaged = unpackaged;
             req.apiVersion = "39.0";
             req.singlePackage = false;
             sforce.metadata.retrieve(req, waitForDone(function(result) {
