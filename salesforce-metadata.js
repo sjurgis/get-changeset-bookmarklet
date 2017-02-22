@@ -331,6 +331,15 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
     sforce.metadata.serverUrl = "/services/Soap/m/39.0";
     sforce.metadata.sessionId = sforce.connection.sessionId;
     
+    function note (str, isError){
+      if(Notification){
+        Notification.requestPermission(function() {
+          var notification = new Notification(str);
+        });
+      } else if (isError){
+        alert(str);
+      }
+    }
     
     
 
@@ -342,22 +351,15 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       function check(results) {
         var done = results[0].getBoolean("done");
         if (!done) {
-          if(Notification){
-            Notification.requestPermission(function() {
-              var notification = new Notification("Changeset is not ready yet, retrying in 3 seconds!");
-            });
-          }
+          
+          note("Changeset is not ready yet, retrying in 3 seconds!");
           
           setTimeout(function() {
             sforce.metadata.checkStatus([results[0].id], check);
           }, 3000);
 
         } else {
-          if(Notification){
-            Notification.requestPermission(function() {
-              var notification = new Notification("File is ready! Have a nice day!");
-            });
-          }
+          note("File is ready! Have a nice day!");
           getResult(results[0].id);
         }
       }
@@ -365,94 +367,95 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
         check([result]);
       };
     }
-  
-    if(document.location.pathname.includes('inboundChangeSetDetailPage')){
-      var input = document.createElement('input');
-      input.addEventListener("change", function(evt) {
-          document.getElementById('filepicker').style="display:none";
-          var reader = new FileReader();
-          reader.onloadend = function(m){
-            
-            var doc = new DOMParser().parseFromString(m.currentTarget.result, "text/xml");
-            var names = doc.getElementsByTagName("name");
+    try {
+      if(document.location.pathname.includes('inboundChangeSetDetailPage')){
+        var input = document.createElement('input');
+        input.addEventListener("change", function(evt) {
+            document.getElementById('filepicker').style="display:none";
+            var reader = new FileReader();
+            reader.onloadend = function(m){
+              
+              var doc = new DOMParser().parseFromString(m.currentTarget.result, "text/xml");
+              var names = doc.getElementsByTagName("name");
 
-            var unpackaged = {
-              types: []
+              var unpackaged = {
+                types: []
+              };
+              [].slice.call(doc.getElementsByTagName("types"))
+                .forEach((t, i) => {
+                  var types = {
+                    name: names[i].innerHTML,
+                    members: [].slice.call(t.getElementsByTagName("members")).map(m => {
+                      return m.innerHTML;
+                    })
+                  };
+                  unpackaged.types.push(types);
+                });
+              
+
+              var req, result;
+              req = new sforce.RetrieveRequest();
+              req.unpackaged = unpackaged;
+              req.apiVersion = "39.0";
+              req.singlePackage = false;
+              sforce.metadata.retrieve(req, waitForDone(function(result) {
+                var byteCharacters = atob(result.zipFile);
+                var byteNumbers = new Array(byteCharacters.length);
+                for (var i = 0; i < byteCharacters.length; i++) {
+                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                var byteArray = new Uint8Array(byteNumbers);
+
+                var blob1 = new Blob([byteArray], {
+                  type: "application/octet-stream"
+                });
+
+                var fileName1 = 'packageName' + ".zip";
+                saveAs(blob1, fileName1);
+              }));
             };
-            [].slice.call(doc.getElementsByTagName("types"))
-              .forEach((t, i) => {
-                var types = {
-                  name: names[i].innerHTML,
-                  members: [].slice.call(t.getElementsByTagName("members")).map(m => {
-                    return m.innerHTML;
-                  })
-                };
-                unpackaged.types.push(types);
-              });
-            
+            reader.readAsText(input.files[0]);
+        }, false);
+        input.type='file';
+        input.accept='.xml';
+        
+        var div = document.createElement('div');
+        div.innerHTML = "<h1> Please select your package.xml file</h1>";
+        div.id = 'filepicker';
+        div.style="opacity:0.9; background: #FFF; width:100%;height:100%; z-index:10;top:0;left:0; position:fixed;"
+        div.appendChild(input);
+        document.body.appendChild(div);
 
-            var req, result;
-            req = new sforce.RetrieveRequest();
-            req.unpackaged = unpackaged;
-            req.apiVersion = "39.0";
-            req.singlePackage = false;
-            sforce.metadata.retrieve(req, waitForDone(function(result) {
-              var byteCharacters = atob(result.zipFile);
-              var byteNumbers = new Array(byteCharacters.length);
-              for (var i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-              }
-              var byteArray = new Uint8Array(byteNumbers);
+      } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
+        var req, result;
+        req = new sforce.RetrieveRequest();
+        req.packageNames = [document.querySelector('span[id*="outboundCs__name"]').innerText];
+        req.apiVersion = "39.0";
+        req.singlePackage = false;
+        sforce.metadata.retrieve(req, waitForDone(function(result) {
+          var byteCharacters = atob(result.zipFile);
+          var byteNumbers = new Array(byteCharacters.length);
+          for (var i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          }
+          var byteArray = new Uint8Array(byteNumbers);
+          var blob1 = new Blob([byteArray], {
+            type: "application/octet-stream"
+          });
 
-              var blob1 = new Blob([byteArray], {
-                type: "application/octet-stream"
-              });
-
-              var fileName1 = 'packageName' + ".zip";
-              saveAs(blob1, fileName1);
-            }));
-          };
-          reader.readAsText(input.files[0]);
-      }, false);
-      input.type='file';
-      input.accept='.xml';
-      
-      var div = document.createElement('div');
-      div.id = 'filepicker';
-      div.style="opacity:0.9; background: #FFF; width:100%;height:100%; z-index:10;top:0;left:0; position:fixed;"
-      div.appendChild(input);
-      document.body.appendChild(div);
-      // input.click();
-
-    } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
-      var req, result;
-      req = new sforce.RetrieveRequest();
-      req.packageNames = [document.querySelector('span[id*="outboundCs__name"]').innerText];
-      req.apiVersion = "39.0";
-      req.singlePackage = false;
-      sforce.metadata.retrieve(req, waitForDone(function(result) {
-        var byteCharacters = atob(result.zipFile);
-        var byteNumbers = new Array(byteCharacters.length);
-        for (var i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
-        }
-        var byteArray = new Uint8Array(byteNumbers);
-
-        var blob1 = new Blob([byteArray], {
-          type: "application/octet-stream"
-        });
-
-        var fileName1 = req.packageNames[0] + ".zip";
-        saveAs(blob1, fileName1);
-      }));
-    } else {
-      if(Notification){
-        Notification.requestPermission(function() {
-          var notification = new Notification(
-            "Woops! Cannot find changeset name. Is it open?");
-        });
+          var fileName1 = req.packageNames[0] + ".zip";
+          saveAs(blob1, fileName1);
+        }));
+      } else {
+        note("Woops! Cannot find changeset name. Is it open?",true)
+        return;
       }
-      return;
+    } catch (err){
+      note('Oops error occured. Please copy the error from JS console and send to developer: ' err,true);
+      console.log(err);
+      throw err;
+      
     }
+    
     
 }());
