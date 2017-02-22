@@ -451,7 +451,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
         return;
       }
     } catch (err){
-      note('Oops error occured. Please copy the error from JS console and send to developer: ' err,true);
+      note('Oops error occured. Please copy the error from JS console and send to developer: ' +err,true);
       console.log(err);
       throw err;
       
