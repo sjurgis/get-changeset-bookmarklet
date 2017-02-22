@@ -365,8 +365,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
         check([result]);
       };
     }
-    var req, result;
-    req = new sforce.RetrieveRequest();
+  
 
     if(document.location.pathname.includes('inboundChangeSetDetailPage')){
       // if(Notification){
@@ -438,42 +437,46 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
           reader.readAsText(input.files[0]);
           // req.Package = this.value;
       }, false);
+
       input.type='file';
       input.accept='.xml';
       document.body.appendChild(input);
       input.click();
-      return;
+
 
 
 
 
     } else if(document.location.pathname.includes('outboundChangeSetDetailPage')){
+      var req, result;
+      req = new sforce.RetrieveRequest();
       req.packageNames = [document.querySelector('span[id*="outboundCs__name"]').innerText];
+      req.apiVersion = "39.0";
+      req.singlePackage = false;
+      sforce.metadata.retrieve(req, waitForDone(function(result) {
+        var byteCharacters = atob(result.zipFile);
+        var byteNumbers = new Array(byteCharacters.length);
+        for (var i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        var byteArray = new Uint8Array(byteNumbers);
+
+        var blob1 = new Blob([byteArray], {
+          type: "application/octet-stream"
+        });
+
+        var fileName1 = req.packageNames[0] + ".zip";
+        saveAs(blob1, fileName1);
+      }));
     } else {
       if(Notification){
         Notification.requestPermission(function() {
           var notification = new Notification(
-            "Woops! Cannot find changeset name. \n Is it open?");
+            "Woops! Cannot find changeset name. Is it open?");
         });
       }
       return;
     }
     
-    req.apiVersion = "39.0";
-    req.singlePackage = false;
-    sforce.metadata.retrieve(req, waitForDone(function(result) {
-      var byteCharacters = atob(result.zipFile);
-      var byteNumbers = new Array(byteCharacters.length);
-      for (var i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      var byteArray = new Uint8Array(byteNumbers);
-
-      var blob1 = new Blob([byteArray], {
-        type: "application/octet-stream"
-      });
-
-      var fileName1 = req.packageNames[0] + ".zip";
-      saveAs(blob1, fileName1);
-    }));
+    
 }());
