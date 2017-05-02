@@ -340,8 +340,8 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
         alert(str);
       }
     }
-    var retryInterval = 3000;
-    
+    var retryInterval = 10000; // first check starts after 3 s
+    var retryIncrement = 5000; // each subsequent adds 5 s
 
     function waitForDone(callback) {
       function getResult(id) {
@@ -351,7 +351,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       function check(results) {
         var done = results[0].getBoolean("done");
         if (!done) {
-          retryInterval += 1000;
+          retryInterval += retryIncrement;
           note("Changeset is not ready yet, retrying in "+ retryInterval/1000 +" seconds!");
           
           setTimeout(function() {
