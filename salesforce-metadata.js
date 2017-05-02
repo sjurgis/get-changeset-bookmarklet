@@ -340,7 +340,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
         alert(str);
       }
     }
-    var retryInterval = 10000; // first check starts after 3 s
+    var retryInterval = 5000; // first check starts after 3 s
     var retryIncrement = 5000; // each subsequent adds 5 s
 
     function waitForDone(callback) {
