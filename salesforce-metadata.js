@@ -8,7 +8,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
 /*global sforce */
 // 4-02-2017 sJurgis added code to suport bookmarklet use case
 (function () {
-    document.body.appendChild(document.createElement('script')).src = 'https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js';
+    document.body.appendChild(document.createElement('script')).src = 'https://sjurgis.github.io/get-changeset-bookmarklet/FileSaver.min.js';
     "use strict";
 
     if (typeof sforce === "undefined" || !sforce.Connection) {
@@ -330,7 +330,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
     sforce.metadata = new sforce.MetadataConnection();
     sforce.metadata.serverUrl = "/services/Soap/m/39.0";
     sforce.metadata.sessionId = sforce.connection.sessionId;
-    
+
     function note (str, isError){
       if(Notification){
         Notification.requestPermission(function() {
@@ -353,7 +353,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
         if (!done) {
           retryInterval += retryIncrement;
           note("Changeset is not ready yet, retrying in "+ retryInterval/1000 +" seconds!");
-          
+
           setTimeout(function() {
             sforce.metadata.checkStatus([results[0].id], check);
           }, retryInterval);
@@ -374,11 +374,11 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
             document.getElementById('filepicker').style="display:none";
             var reader = new FileReader();
             reader.onloadend = function(m){
-              
+
               var doc = new DOMParser().parseFromString(m.currentTarget.result, "text/xml");
               var names = doc.getElementsByTagName("name");
               var fullName = doc.getElementsByTagName("fullName");
-              
+
               var unpackaged = {
                 types: []
               };
@@ -392,7 +392,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
                   };
                   unpackaged.types.push(types);
                 });
-              
+
 
               var req, result;
               req = new sforce.RetrieveRequest();
@@ -419,7 +419,7 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
         }, false);
         input.type='file';
         input.accept='.xml';
-        
+
         var div = document.createElement('div');
         div.innerHTML = "<h1> Please select your package.xml file</h1>";
         div.id = 'filepicker';
@@ -455,8 +455,8 @@ https://github.com/mino0123/salesforce-metadata.js/LICENSE
       note('Oops error occured. Please copy the error from JS console and send to developer: ' +err,true);
       console.log(err);
       throw err;
-      
+
     }
-    
-    
+
+
 }());
